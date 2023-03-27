@@ -1,0 +1,41 @@
+@use 'variables';
+@import 'font';
+
+.card {
+  width: 340px;
+  height: 480px;
+  border-radius: 25px;
+  background-color: lighten(variables.$penn-blue, 5%);
+  padding: 15px;
+  display: grid;
+  grid-template-rows: 50px 1fr 60px;
+  box-shadow: inset 4px 4px 4px rgba(0, 0, 0, 0.4);
+  margin: 10px;
+  .cardBody {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    .cardImage {
+      width: 300px;
+      height: 150px;
+      background-color: yellow;
+    }
+
+    .cardDescription {
+      text-align: center;
+    }
+
+
+  }
+  .cardCategories {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    min-width: 200px;
+
+    .categoryBox {
+      margin: 10px;
+    }
+  }
+}

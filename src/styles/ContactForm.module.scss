@@ -1,0 +1,55 @@
+@use 'variables';
+@import 'font';
+
+.contactWindow {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .closeWindow {
+    background-color: hsla(0, 0%, 0%, 0.514);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 40;
+  }
+  .contactContainer{
+    z-index: 50;
+    width: 90%;
+    max-width: 600px;
+    background-color: variables.$penn-blue;
+    padding: 50px;
+    border-radius: 25px;
+    .contactForm {
+      width: 100%;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      .formInput{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        input {
+          width: 100%;
+          height: 50px;
+          border-radius: 10px;
+          border: none;
+        }
+      }
+      input[type="submit"]{
+        margin-top: 20px;
+        height: 50px;
+        width: 150px;
+        border-radius: 10px;
+        border: none;
+        font-size: 25px;
+
+      }
+    }
+  }
+}

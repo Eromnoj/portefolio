@@ -1,0 +1,45 @@
+@use 'variables';
+@import 'font';
+
+.navBar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 20;
+
+  @media screen and (min-width: 680px) {
+    position: relative;
+    height: 100px;
+  }
+
+  .navList {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    align-items: center;
+
+    .navItem {
+      margin-right: 20px;
+      margin-left: 50px;
+    }
+
+  }
+
+  .navListResponsive {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    transform: translateY(-250px);
+    transition: transform 1s;
+  }
+
+  .navListDown {
+    transform: translateY(50px);
+    transition: transform 1s;
+  }
+}

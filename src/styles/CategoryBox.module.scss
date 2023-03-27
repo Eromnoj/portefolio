@@ -1,0 +1,25 @@
+@use 'variables';
+
+.categoryBox {
+  background-color: variables.$periwinkle;
+  border-radius: 15px;
+  width: 65px;
+  height: 65px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  filter: drop-shadow(0 0 0 variables.$xanthous);
+  transition: filter 0.3s;
+  .categoryImg {
+    width: 55px;
+    height: 55px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+}
+
+.selected {
+  background-color: variables.$xanthous;
+  filter: drop-shadow(0 0 2px variables.$xanthous);
+  transition: filter 0.3s;
+}

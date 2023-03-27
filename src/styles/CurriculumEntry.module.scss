@@ -1,0 +1,43 @@
+@use 'variables';
+@import 'font';
+
+.contentFormat{
+  width: 90%;
+  margin: auto;
+  margin-top: 20px;
+  display: flex;
+    flex-direction: column;
+    .contentTitle {
+    padding: 10px;
+    width: 90%;
+  }
+  .contentText {
+    padding: 10px;
+    padding-left: 25px;
+    width : 90%;
+    text-align: left;
+    border-left: solid 3px variables.$rusty-red;
+    margin: auto;
+  }
+}
+
+
+@media screen and (min-width: 680px) {
+  .contentFormat{
+    max-width: 900px;
+    margin: auto;
+    margin-top: 20px;
+    flex-direction: row;
+    .contentTitle {
+      padding: 10px;
+      max-width: 280px;
+    }
+    .contentText {
+      padding: 10px;
+      padding-left: 25px;
+      max-width : 620px;
+      text-align: left;
+      border-left: solid 3px variables.$rusty-red;
+    }
+  }
+}

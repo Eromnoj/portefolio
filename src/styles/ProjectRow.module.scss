@@ -1,0 +1,45 @@
+@use 'variables';
+@import 'font';
+
+.tableForm {
+  background-color: variables.$penn-blue;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 10px;
+  border-radius: 15px;
+  
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    input {
+      width: 90%;
+
+      &[type=text] {
+        height: 25px;
+        margin: 5px;
+        border-radius: 5px;
+        background-color: variables.$mint-green;
+        font-size: 20px;
+        padding: 3px;
+      }
+
+      &[type=file] {
+        background-color: variables.$mint-green;
+        height: 25px;
+        margin: 5px;
+        border-radius: 5px;
+        font-size: 17px;
+      }
+
+      &[type=submit] {
+        background-color: variables.$rusty-red;
+        cursor: pointer;
+        font-size: 20px;
+      }
+    }
+  }
+}
+

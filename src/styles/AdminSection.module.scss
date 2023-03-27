@@ -1,0 +1,71 @@
+@use 'variables';
+@import 'font';
+
+.adminSection {
+  background-color: variables.$mint-green;
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 150px;
+  padding: 20px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.adminForm {
+  background-color: variables.$penn-blue;
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 15px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    align-items: center;
+
+    input {
+      width: 50%;
+
+      &[type=text] {
+        height: 30px;
+        margin: 5px;
+        border-radius: 5px;
+        background-color: variables.$mint-green;
+        font-size: 25px;
+        padding: 3px;
+      }
+
+      &[type=file] {
+        background-color: variables.$mint-green;
+        height: 42px;
+        margin: 5px;
+        border-radius: 5px;
+        font-size: 25px;
+        padding: 3px;
+
+      }
+
+      &[type=submit] {
+        background-color: variables.$rusty-red;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.adminTable {
+  width: 70%;
+  border: 1px black solid;
+  border-collapse: collapse;
+  th, td {
+    font-weight: bold;
+    border: 1px black solid;
+    text-align: center;
+    vertical-align: middle;
+  }
+}

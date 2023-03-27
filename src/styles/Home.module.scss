@@ -1,0 +1,46 @@
+@use 'variables';
+@import 'font';
+
+.toggleMenu {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  position: fixed;
+  z-index: 40;
+}
+
+.headerContent {
+  width: 100%;
+  height: 500px;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: center;
+  .headerName {
+    width: 90%;
+    max-width: 470px;
+  }
+  .glassesDiv{
+    width: 90%;
+    max-width: 470px;
+    svg {
+      overflow: visible;
+    }
+  }
+}
+
+
+.footer{
+  margin-top: 150px;
+  width: 100%;
+  height: 200px;
+  border-top: solid 1px variables.$rusty-red;
+  background-color: darken(variables.$penn-blue, 7%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.section {
+  margin-top: 150px;
+}
+
