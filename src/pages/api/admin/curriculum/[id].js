@@ -33,7 +33,7 @@ export default async function handler(
         } catch (e) {
           console.error(e)
           await prisma.$disconnect()
-          res.status(500).json({message: 'Pas de curriculae enregistrées'})
+          res.status(404).json({message: 'Pas de curriculae enregistrées'})
           return resolve()
         }
       }
@@ -54,7 +54,7 @@ export default async function handler(
 
         } catch (e) {
           await prisma.$disconnect()
-          res.status(200).json({ message: 'La ligne de cv n\'existe pas' })
+          res.status(404).json({ message: 'La ligne de cv n\'existe pas' })
           return resolve()
         }
       }
@@ -85,7 +85,7 @@ export default async function handler(
         } catch (e) {
           console.error(e)
           await prisma.$disconnect()
-          res.status(500).json({ e })
+          res.status(500).json({ message: "La catégorie n'existe pas" })
           return resolve()
         }
       

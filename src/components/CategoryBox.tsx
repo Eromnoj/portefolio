@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import styles from '@/styles/CategoryBox.module.scss';
 import type { FC } from 'react'
 import Image from 'next/image';
-import { myLoader } from '@/lib/utils/function'
 import type { CategoryBoxFilterProps } from '@/lib/types/props';
 
 
@@ -17,7 +16,6 @@ const CategoryBox: FC<CategoryBoxFilterProps> = ({id, image, alt, onClick}) => {
       }}>
       <div className={styles.categoryImg}>
         <Image 
-        loader={myLoader}
         src={image}
         alt={alt}
         width={55}

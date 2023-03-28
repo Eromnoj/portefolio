@@ -2,7 +2,6 @@ import React, { FC } from 'react'
 import styles from '@/styles/Card.module.scss'
 import Image from 'next/image'
 import CategoryBox from './CategoryBox'
-import { myLoader } from '@/lib/utils/function'
 import type { CardProps } from '@/lib/types/props'
 import Link from 'next/link'
 
@@ -18,7 +17,6 @@ const Cards:FC<CardProps> = ({name, image, url, description, categories}) => {
         <div className={[styles.cardImage].join(' ')}>
           <Link href={url} target='_blank' >
         <Image 
-        loader={myLoader}
         src={image}
         alt={name}
         width={300}

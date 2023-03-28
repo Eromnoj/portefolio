@@ -7,6 +7,9 @@ import client from '@/lib/utils/prismadb';
 import { authOptions } from '../../auth/[...nextauth]'
 import { getServerSession } from "next-auth/next"
 
+import cloudStorage from '../../../../lib/utils/cloudinary'
+import { uid } from 'uid'
+
 export const config = {
   api: {
     bodyParser: false
@@ -21,7 +24,7 @@ export default async function handler(
 ) {
   return new Promise(async (resolve) => {
 
-    if (req.method === 'GET'){
+    if (req.method === 'GET') {
       try {
         const category = await prisma.category.findMany()
 
@@ -30,12 +33,12 @@ export default async function handler(
         return resolve()
 
       } catch (e) {
-        console.error(e)
         await prisma.$disconnect()
-        process.exit(1)
+        res.status(404).json({ error: 'Aucune catégories trouvées' })
+        resolve()
       }
 
-    }else if (req.method === 'POST') {
+    } else if (req.method === 'POST') {
 
       const session = await getServerSession(req, res, authOptions)
 
@@ -44,12 +47,6 @@ export default async function handler(
         return resolve()
       }
 
-      // check if folder exists, if not create it
-      try {
-        await fs.readdir(path.join(process.cwd() + "/public", "/uploads"))
-      } catch (error) {
-        await fs.mkdir(path.join(process.cwd() + "/public", "/uploads"))
-      }
       // configure formidable options
       const options = {}
       options.uploadDir = path.join(process.cwd(), "/public/uploads")
@@ -61,13 +58,12 @@ export default async function handler(
       }
       const form = formidable(options)
 
-      
+
       form.parse(req, async (err, fields, files) => {
         if (err) {
           res.status(500).json({ error: 'Une erreur est survenue' })
+          resolve()
         }
-
-        // res.json({fields,files})
 
         const categoryExists = await prisma.category.findFirst({
           where: {
@@ -76,28 +72,34 @@ export default async function handler(
         })
 
         if (categoryExists === null) {
+
           try {
+            const cloudinaryImgId = uid()
+            const resCloudinary = await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
             const category = await prisma.category.create({
               data: {
                 alt: fields.alt[0],
-                image: files.image[0].newFilename
+                image: resCloudinary.secure_url,
+                cloudinaryImgId: cloudinaryImgId
               }
             })
 
             await prisma.$disconnect()
-            res.status(200).json({ data: category })
+            await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+            res.status(201).json({ data: category })
             return resolve()
 
           } catch (e) {
-            console.error(e)
+            await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
             await prisma.$disconnect()
-            process.exit(1)
+            res.status(500).json({ message: 'Erreur lors de la création de la catégorie' })
+            return resolve()
           }
         } else {
           await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
-          res.status(500).json({ message: 'Categorie existe déjà' })
-            await prisma.$disconnect()
-            return resolve()
+          await prisma.$disconnect()
+          res.status(400).json({ message: 'Categorie existe déjà' })
+          return resolve()
         }
       })
 

@@ -1,7 +1,7 @@
 import React, { FC, FormEvent, useState } from 'react'
 import type { WebEntryProps } from '@/lib/types/props'
 import axios from 'axios'
-import { myLoader, myAssets } from '@/lib/utils/function'
+import { myAssets } from '@/lib/utils/function'
 import Image from 'next/image'
 import styles from '@/styles/CategoryRow.module.scss'
 
@@ -57,7 +57,6 @@ const WebRows: FC<WebEntryProps> = ({ id, url, alt, logo, getWebs }) => {
         <td>{url}</td>
         <td>
           <Image
-            loader={myLoader}
             src={logo}
             alt={alt}
             width={80}

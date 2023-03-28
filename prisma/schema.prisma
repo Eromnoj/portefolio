@@ -71,19 +71,21 @@ model Presentation {
 }
 
 model Category {
-  id       String    @id @default(cuid())
-  image    String
-  alt      String
-  projects Project[]
+  id              String    @id @default(cuid())
+  image           String
+  alt             String
+  cloudinaryImgId String    
+  projects        Project[]
 }
 
 model Project {
-  id          String     @id @default(cuid())
-  name        String
-  image       String
-  url         String
-  description String     @db.Text
-  categories  Category[]
+  id              String     @id @default(cuid())
+  name            String
+  image           String
+  url             String
+  cloudinaryImgId String     
+  description     String     @db.Text
+  categories      Category[]
 }
 
 model Curriculum {
@@ -95,8 +97,9 @@ model Curriculum {
 }
 
 model Web {
-  id   String @id @default(cuid())
-  logo String
-  alt  String
-  url  String
+  id              String @id @default(cuid())
+  logo            String
+  alt             String
+  cloudinaryImgId String 
+  url             String
 }

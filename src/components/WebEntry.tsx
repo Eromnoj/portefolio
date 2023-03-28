@@ -2,7 +2,6 @@ import React, { FC } from 'react'
 import styles from '@/styles/WebEntry.module.scss'
 import Image from 'next/image'
 import Link from 'next/link'
-import { myLoader } from '@/lib/utils/function'
 import type { WebEntryType } from '@/lib/types/props'
 
 
@@ -11,7 +10,6 @@ const WebEntry:FC<WebEntryType> = ({id, logo, alt, url}) => {
     <div className={[styles.socialImg].join(' ')}>
       <Link href={url} target='_blank'>
       <Image 
-        loader={myLoader}
         src={logo}
         alt={alt}
         width={150}

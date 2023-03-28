@@ -24,7 +24,7 @@ export default async function handler(
       } catch (e) {
         console.error(e)
         await prisma.$disconnect()
-        res.status(500).json({ message: "Pas d'entrée curriculum" })
+        res.status(404).json({ message: "Pas de présentation enregistrée" })
       }
 
     } else if (req.method === 'POST') {
@@ -63,9 +63,8 @@ export default async function handler(
         return resolve()
 
       } catch (e) {
-        console.error(e)
         await prisma.$disconnect()
-        res.status(500).json({ e })
+        res.status(500).json({ message : "Erreur lors de l'enregistrement de la présentation"})
         return resolve()
       }
 

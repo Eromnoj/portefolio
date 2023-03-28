@@ -12,10 +12,7 @@ export default async function handler(
 
       const {filter} = req.query
 
-      console.log(filter);
-      
       try {
-
       let project
       if(filter && filter.length > 0) {
         project = await prisma.project.findMany({
@@ -31,9 +28,7 @@ export default async function handler(
         })
       } else {
         project = await prisma.project.findMany({
-
           include: { categories: true },
-
         })
       }
         await prisma.$disconnect()
@@ -41,9 +36,9 @@ export default async function handler(
         return resolve()
 
       } catch (e) {
-        console.error(e)
         await prisma.$disconnect()
         res.status(500).json({message : "Une erreur est survenue"})
+        return resolve()
       }
 
     } 

@@ -1,7 +1,7 @@
 import React, { FC, FormEvent, useEffect, useState } from 'react'
 import type { ProjectRowProps } from '@/lib/types/props'
 import axios from 'axios'
-import { myLoader, myAssets } from '@/lib/utils/function'
+import { myAssets } from '@/lib/utils/function'
 import Image from 'next/image'
 import styles from '@/styles/ProjectRow.module.scss'
 import type { CategorySelect } from '@/lib/types/state'
@@ -97,7 +97,6 @@ const ProjectRow: FC<ProjectRowProps> = ({ id, name, description, image, url, ca
         
         <td>
           <Image
-            loader={myLoader}
             src={image}
             alt={name}
             width={80}

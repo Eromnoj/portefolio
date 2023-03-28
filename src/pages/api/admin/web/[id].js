@@ -6,6 +6,8 @@ import client from '@/lib/utils/prismadb';
 
 import { authOptions } from '../../auth/[...nextauth]'
 import { getServerSession } from "next-auth/next"
+import cloudStorage from '../../../../lib/utils/cloudinary'
+import { uid } from 'uid';
 
 export const config = {
   api: {
@@ -42,9 +44,8 @@ export default async function handler(
           return resolve()
 
         } catch (e) {
-          console.error(e)
           await prisma.$disconnect()
-          res.status(500).json({message: 'Pas de lien web enregistrées'})
+          res.status(404).json({message: 'Pas de lien web enregistrées'})
           return resolve()
         }
       }
@@ -57,13 +58,12 @@ export default async function handler(
               id: id
             }
           })
-          const imageName = web.logo
 
           await prisma.$disconnect()
           try {
-            await fs.rm(path.join(process.cwd() + "/public", "/uploads", imageName))
+            await cloudStorage.api.delete_resources([web.cloudinaryImgId])
           } catch (error) {
-            res.status(200).json({ data: web })
+            res.status(500).json({ message: "Erreur lors de la suppression de l'image du cloud" })
             return resolve()
           }
           res.status(200).json({ data: web })
@@ -71,7 +71,7 @@ export default async function handler(
 
         } catch (e) {
           await prisma.$disconnect()
-          res.status(200).json({ message: 'Le lien web n\'existe pas' })
+          res.status(404).json({ message: 'Le lien web n\'existe pas' })
           return resolve()
         }
       }
@@ -100,45 +100,41 @@ export default async function handler(
               return resolve()
             }
 
-            try {
-              
+            try {        
               const currentWeb = await prisma.web.findUnique({
                 where: {
                   id: id
                 }
               })
-              
-              let currentLogo = ''
-              let currentUrl = ''
+             
               await prisma.$disconnect()
               if (currentWeb !== null && (files.image !== undefined && files.image.length > 0)) {
-                currentUrl = currentWeb.url
                 try {
-                  await fs.rm(path.join(process.cwd() + "/public", "/uploads", currentWeb.logo))
+                  await cloudStorage.api.delete_resources([currentWeb.cloudinaryImgId])
                 } catch (error) {
                   res.status(500).json({ message: 'Une erreur est survenue 13' })
                   return resolve()
                 }
-              } else if (currentWeb !== null) {
-                currentLogo = currentWeb.logo
-                currentUrl = currentWeb.url
-              }
+              } 
 
               try {
-                
-                
+                const cloudinaryImgId = uid()
+                const resCloudinary = await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
+      
                 const web = await prisma.web.update({
                   where: {
                     id: id
                   },
                   data: {
-                    url: fields.url[0],
-                    alt: fields.alt[0],
-                    logo: files.image !== undefined ? files.image[0].newFilename : currentLogo
+                    url: fields.url !== undefined ? fields.url[0] : currentWeb.url,
+                    alt: fields.alt !== undefined ? fields.alt[0] : currentWeb.alt,
+                    logo: files.image !== undefined ? resCloudinary.secure_url : currentWeb.logo,
+                    cloudinaryImgId: files.image !== undefined ? cloudinaryImgId : currentCategory.cloudinaryImgId
                   }
                 })
 
                 await prisma.$disconnect()
+                await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
                 res.status(200).json({ data: web })
                 return resolve()
 
@@ -146,8 +142,8 @@ export default async function handler(
                 console.error(e)
                 await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
                 await prisma.$disconnect()
-                res.status(500).json({ message: 'Aucune lien web ne correspond a cet id 25' })
-
+                res.status(404).json({ message: 'Aucune lien web ne correspond a cet id' })
+                return resolve()
               }
 
             } catch (error) {
@@ -159,7 +155,7 @@ export default async function handler(
           })
         } catch (e) {
           await prisma.$disconnect()
-          res.status(200).json({ message: 'La lien web n\'existe pas' })
+          res.status(404).json({ message: 'La lien web n\'existe pas' })
           return resolve()
         }
       }

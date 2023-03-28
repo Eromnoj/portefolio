@@ -6,6 +6,8 @@ import client from '@/lib/utils/prismadb';
 
 import { authOptions } from '../../auth/[...nextauth]'
 import { getServerSession } from "next-auth/next"
+import cloudStorage from '../../../../lib/utils/cloudinary'
+import { uid } from 'uid'
 
 export const config = {
   api: {
@@ -36,9 +38,9 @@ export default async function handler(
         return resolve()
         
       } catch (e) {
-        console.error(e)
         await prisma.$disconnect()
-        process.exit(1)
+        res.status(404).json({ message : "Aucun projets trouvés" })
+        return resolve()
       }
       
     } else if (req.method === 'POST') {
@@ -48,12 +50,7 @@ export default async function handler(
         res.status(401).json({ message: "You must be logged in." });
         return resolve()
       }
-      // check if folder exists, if not create it
-      try {
-        await fs.readdir(path.join(process.cwd() + "/public", "/uploads"))
-      } catch (error) {
-        await fs.mkdir(path.join(process.cwd() + "/public", "/uploads"))
-      }
+
       // configure formidable options
       const options = {}
       options.uploadDir = path.join(process.cwd(), "/public/uploads")
@@ -72,8 +69,6 @@ export default async function handler(
           return resolve()
         }
 
-        // res.json({fields,files})
-
         const projectExists = await prisma.project.findFirst({
           where: {
             name: fields.name[0]
@@ -85,33 +80,36 @@ export default async function handler(
             id: cat
           }
         })
-        console.log(categories);
 
         if (projectExists === null) {
           try {
+            const cloudinaryImgId = uid()
+            const resCloudinary = await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
             const project = await prisma.project.create({
               data: {
                 name: fields.name[0],
                 url: fields.url[0],
                 description: fields.description[0],
-                image: files.image[0].newFilename,
-                categories: { connect: categories }
+                image: resCloudinary.secure_url,
+                categories: { connect: categories },
+                cloudinaryImgId: cloudinaryImgId
               }
             })
 
             await prisma.$disconnect()
-            res.status(200).json({ data: project })
+            await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+            res.status(201).json({ data: project })
             return resolve()
 
           } catch (e) {
-            console.error(e)
+            await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
             await prisma.$disconnect()
-            res.status(500).json({ e })
+            res.status(500).json({ message : "Erreur lors de la création du projet" })
             return resolve()
           }
         } else {
           await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
-          res.status(500).json({ message: 'Categorie existe déjà' })
+          res.status(400).json({ message: 'Categorie existe déjà' })
           await prisma.$disconnect()
           return resolve()
         }

@@ -1,5 +1,4 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-
 import formidable from 'formidable'
 import path from 'path'
 import fs from 'fs/promises'
@@ -7,6 +6,8 @@ import client from '@/lib/utils/prismadb';
 
 import { authOptions } from '../../auth/[...nextauth]'
 import { getServerSession } from "next-auth/next"
+import cloudStorage from '../../../../lib/utils/cloudinary'
+import { uid } from 'uid';
 
 export const config = {
   api: {
@@ -43,9 +44,8 @@ export default async function handler(
           return resolve()
 
         } catch (e) {
-          console.error(e)
           await prisma.$disconnect()
-          res.status(500).json({message: 'Pas de catégories enregistrées'})
+          res.status(404).json({ message: 'Pas de catégorie enregistrée avec cet ID' })
           return resolve()
         }
       }
@@ -58,13 +58,12 @@ export default async function handler(
               id: id
             }
           })
-          const imageName = category.image
 
           await prisma.$disconnect()
           try {
-            await fs.rm(path.join(process.cwd() + "/public", "/uploads", imageName))
+            await cloudStorage.api.delete_resources([category.cloudinaryImgId])
           } catch (error) {
-            res.status(200).json({ data: category })
+            res.status(500).json({ message: "Erreur lors de la suppression de l'image du cloud" })
             return resolve()
           }
           res.status(200).json({ data: category })
@@ -72,7 +71,7 @@ export default async function handler(
 
         } catch (e) {
           await prisma.$disconnect()
-          res.status(200).json({ message: 'La catégorie n\'existe pas' })
+          res.status(404).json({ message: 'La catégorie n\'existe pas' })
           return resolve()
         }
       }
@@ -108,36 +107,35 @@ export default async function handler(
                 }
               })
 
-              let currentImage = ''
-              let currentAlt = ''
               await prisma.$disconnect()
               if (currentCategory !== null && (files.image !== undefined && files.image.length > 0)) {
-                currentAlt = currentCategory.alt
                 try {
-                  await fs.rm(path.join(process.cwd() + "/public", "/uploads", currentCategory.image))
+                  await cloudStorage.api.delete_resources([currentCategory.cloudinaryImgId])
                 } catch (error) {
                   res.status(500).json({ message: 'Une erreur est survenue 13' })
                   return resolve()
                 }
-              } else if (currentCategory !== null) {
-                currentAlt = currentCategory.alt
-                currentImage = currentCategory.image
               }
 
               try {
-                console.log(fields.alt[0]);
-                
+
+                const cloudinaryImgId = uid()
+                const resCloudinary = await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
+
+
                 const category = await prisma.category.update({
                   where: {
                     id: id
                   },
                   data: {
-                    alt: fields.alt[0],
-                    image: files.image !== undefined ? files.image[0].newFilename : currentImage
+                    alt: fields.alt !== undefined ? fields.alt[0] : currentCategory.alt,
+                    image: files.image !== undefined ? resCloudinary.secure_url : currentCategory.image,
+                    cloudinaryImgId: files.image !== undefined ? cloudinaryImgId : currentCategory.cloudinaryImgId
                   }
                 })
 
                 await prisma.$disconnect()
+                await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
                 res.status(200).json({ data: category })
                 return resolve()
 
@@ -145,20 +143,20 @@ export default async function handler(
                 console.error(e)
                 await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
                 await prisma.$disconnect()
-                res.status(500).json({ message: 'Aucune catégorie ne correspond a cet id' })
-
+                res.status(404).json({ message: 'Aucune catégorie ne correspond a cet id' })
+                return resolve()
               }
 
             } catch (error) {
-            await prisma.$disconnect()
-            res.status(500).json({ message: 'Aucune catégorie ne correspond a cet id' })
+              await prisma.$disconnect()
+              res.status(404).json({ message: 'Aucune catégorie ne correspond a cet id' })
               return resolve()
             }
 
           })
         } catch (e) {
           await prisma.$disconnect()
-          res.status(200).json({ message: 'La catégorie n\'existe pas' })
+          res.status(500).json({ message: 'La catégorie n\'existe pas' })
           return resolve()
         }
       }

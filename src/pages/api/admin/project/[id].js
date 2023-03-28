@@ -6,6 +6,8 @@ import client from '@/lib/utils/prismadb';
 
 import { authOptions } from '../../auth/[...nextauth]'
 import { getServerSession } from "next-auth/next"
+import cloudStorage from '../../../../lib/utils/cloudinary'
+import { uid } from 'uid';
 
 export const config = {
   api: {
@@ -45,9 +47,9 @@ export default async function handler(
           return resolve()
 
         } catch (e) {
-          console.error(e)
           await prisma.$disconnect()
-          process.exit(1)
+          res.status(404).json({message: 'Pas de projet enregistré avec cet ID'})
+          return resolve()
         }
       }
     } else if (req.method === 'DELETE') {
@@ -59,13 +61,12 @@ export default async function handler(
               id: id
             }
           })
-          const imageName = project.image
 
           await prisma.$disconnect()
           try {
-            await fs.rm(path.join(process.cwd() + "/public", "/uploads", imageName))
+            await cloudStorage.api.delete_resources([project.cloudinaryImgId])
           } catch (error) {
-            res.status(200).json({ data: project })
+            res.status(500).json({ message : "Erreur lors de la suppression de l'image du cloud" })
             return resolve()
           }
           res.status(200).json({ data: project })
@@ -109,38 +110,22 @@ export default async function handler(
                 include:{categories: true}
               })
 
-              let currentImage = ''
-              let currentName = ''
-              let currentDescription = ''
-              let currentUrl = ''
-              let currentCategories = []
+              
+              // const currentCategories = currentProject.categories.map(cat => {
+              //   return {
+              //     id: cat.id
+              //   }
+              // })
+
               await prisma.$disconnect()
               if (currentProject !== null && (files.image !== undefined && files.image.length > 0)) {
-                currentName = currentProject.name
-                currentDescription = currentProject.description
-                currentUrl = currentProject.url
-                currentCategories = currentProject.categories.map(cat => {
-                  return {
-                    id: cat.id
-                  }
-                })
                 try {
-                  await fs.rm(path.join(process.cwd() + "/public", "/uploads", currentProject.image))
+                  await cloudStorage.api.delete_resources([currentProject.cloudinaryImgId])
                 } catch (error) {
                   res.status(500).json({ message: 'Une erreur est survenue 13' })
                   return resolve()
                 }
-              } else if (currentProject !== null) {
-                currentName = currentProject.name
-                currentDescription = currentProject.description
-                currentUrl = currentProject.url
-                currentCategories = currentProject.categories.map(cat => {
-                  return {
-                    id: cat.id
-                  }
-                })
-                currentImage = currentProject.image
-              }
+              } 
 
               try {
                 const categories = fields.categories[0].split('//').map(cat => {
@@ -149,20 +134,25 @@ export default async function handler(
                   }
                 }) 
                 
+                const cloudinaryImgId = uid()
+                const resCloudinary = await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
+
                 const project = await prisma.project.update({
                   where: {
                     id: id
                   },
                   data: {
-                    name: fields.name[0],
-                    description: fields.description[0],
-                    url: fields.url[0],
+                    name: fields.name !== undefined ? fields.name[0] : currentProject.image,
+                    description: fields.description !== undefined ? fields.description[0]: currentProject.description,
+                    url: fields.url !== undefined ? fields.url[0] : currentProject.url,
                     categories : {set: categories},
-                    image: files.image !== undefined ? files.image[0].newFilename : currentImage
+                    image: files.image !== undefined ? resCloudinary.secure_url : currentProject.image,
+                    cloudinaryImgId: files.image !== undefined ? cloudinaryImgId : currentProject.cloudinaryImgId
                   }
                 })
 
                 await prisma.$disconnect()
+                await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
                 res.status(200).json({ data: project })
                 return resolve()
 
@@ -170,7 +160,7 @@ export default async function handler(
                 console.error(e)
                 await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
                 await prisma.$disconnect()
-                res.status(500).json({ message: 'Aucun projet ne correspond a cet id' })
+                res.status(404).json({ message: 'Aucun projet ne correspond a cet id' })
 
               }
 
@@ -183,7 +173,7 @@ export default async function handler(
           })
         } catch (e) {
           await prisma.$disconnect()
-          res.status(200).json({ message: 'Le projet n\'existe pas' })
+          res.status(404).json({ message: 'Le projet n\'existe pas' })
           return resolve()
         }
       }

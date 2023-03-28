@@ -56,7 +56,6 @@ const CategoryRow: FC<CategoryRowProps> = ({ id, alt, image, getCategories }) =>
         <td>{alt}</td>
         <td>
           <Image
-            loader={myLoader}
             src={image}
             alt={alt}
             width={80}
