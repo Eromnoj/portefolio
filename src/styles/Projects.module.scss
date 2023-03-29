@@ -3,6 +3,7 @@
 
 .projet {
   margin: auto;
+
   .filter {
     display: flex;
     justify-content: center;
@@ -10,23 +11,27 @@
     align-items: center;
     margin-top: 50px;
     margin-bottom: 50px;
+
     .categories {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-around;
       align-items: center;
       min-width: 200px;
+
       >div {
         margin: 10px;
       }
     }
   }
+
   .cardShowCase {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
     width: 80%;
     margin: auto;
+    overflow-x: hidden;
+
   }
 }
-

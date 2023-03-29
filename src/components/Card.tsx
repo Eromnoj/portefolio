@@ -19,11 +19,12 @@ const Cards:FC<CardProps> = ({name, image, url, description, categories}) => {
         <Image 
         src={image}
         alt={name}
-        width={300}
+        width={290}
         height={150}
         quality={100}
         style={{
-          objectFit: 'cover'
+          objectFit: 'cover',
+          borderRadius: '10px'
         }}
         />
         </Link>

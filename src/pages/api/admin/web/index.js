@@ -72,7 +72,7 @@ export default async function handler(
         if (webExists === null) {
           try {
             const cloudinaryImgId = uid()
-            const resCloudinary = await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
+            const resCloudinary = files.image !== undefined &&  await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
             const web = await prisma.web.create({
               data: {
                 url: fields.url[0],
@@ -83,18 +83,17 @@ export default async function handler(
             })
 
             await prisma.$disconnect()
-            await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
-            res.status(201).json({ data: category })
+            files.image !== undefined && await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+            res.status(201).json({ data: web })
             return resolve()
-
           } catch (e) {
-            await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+            files.image !== undefined && await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
             await prisma.$disconnect()
             res.status(500).json({ message: 'Erreur lors de la création du lien web' })
             return resolve()
           }
         } else {
-          await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+          files.image !== undefined && await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
           res.status(500).json({ message: 'Lien existe déjà' })
           await prisma.$disconnect()
           return resolve()

@@ -26,10 +26,12 @@ const WebAdmin = () => {
         })
 
         const resData = await res.data
+        console.log(res.data);
+        
         getWebs()
 
       } catch (error: any) {
-        console.error(error?.response.data.message);
+        console.error(error);
 
       }
     }

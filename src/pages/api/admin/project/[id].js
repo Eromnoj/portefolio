@@ -110,7 +110,8 @@ export default async function handler(
                 include:{categories: true}
               })
 
-              
+              console.log('id', id);
+              console.log('fields', fields);
               // const currentCategories = currentProject.categories.map(cat => {
               //   return {
               //     id: cat.id
@@ -133,9 +134,11 @@ export default async function handler(
                     id: cat
                   }
                 }) 
-                
+                console.log('categories', categories);
                 const cloudinaryImgId = uid()
-                const resCloudinary = await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
+               
+                  files.image !== undefined && await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
+                
 
                 const project = await prisma.project.update({
                   where: {
@@ -152,15 +155,15 @@ export default async function handler(
                 })
 
                 await prisma.$disconnect()
-                await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+                files.image !== undefined && await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
                 res.status(200).json({ data: project })
                 return resolve()
 
               } catch (e) {
                 console.error(e)
-                await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+                files.image !== undefined && await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
                 await prisma.$disconnect()
-                res.status(404).json({ message: 'Aucun projet ne correspond a cet id' })
+                res.status(404).json({ message: 'Aucun projet ne correspond a cet id 33' })
 
               }
 

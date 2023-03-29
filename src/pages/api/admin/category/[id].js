@@ -120,7 +120,7 @@ export default async function handler(
               try {
 
                 const cloudinaryImgId = uid()
-                const resCloudinary = await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
+                const resCloudinary = files.image !== undefined && await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
 
 
                 const category = await prisma.category.update({
@@ -135,13 +135,12 @@ export default async function handler(
                 })
 
                 await prisma.$disconnect()
-                await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+                files.image !== undefined && await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
                 res.status(200).json({ data: category })
                 return resolve()
 
               } catch (e) {
-                console.error(e)
-                await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+                files.image !== undefined && await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
                 await prisma.$disconnect()
                 res.status(404).json({ message: 'Aucune catégorie ne correspond a cet id' })
                 return resolve()

@@ -21,6 +21,9 @@ const CategoryBox: FC<CategoryBoxFilterProps> = ({id, image, alt, onClick}) => {
         width={55}
         height={55}
         quality={100}
+        style={{
+          borderRadius: '10px'
+        }}
         />
       </div>
     </div>

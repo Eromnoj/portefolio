@@ -18,7 +18,7 @@ export default async function handler(
         project = await prisma.project.findMany({
           where: {
             categories: {
-              some: {
+             some: {
                 id: { in: filter }
               }
             }

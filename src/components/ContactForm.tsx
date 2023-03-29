@@ -1,10 +1,11 @@
-import React, { useReducer, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 import styles from '@/styles/ContactForm.module.scss'
 import type { FC } from 'react'
 import type { ContactFormProps } from '@/lib/types/props'
 import axios from 'axios'
 import LoadingSVG from './LoadingSVG'
 import Link from 'next/link'
+import gsap from 'gsap'
 
 type mail = {
   email: string,
@@ -59,9 +60,26 @@ const ContactForm: FC<ContactFormProps> = ({ hideContact }) => {
   const [loading, setLoading] = useState(false)
   const [messageSent, setMessageSent] = useState(false)
 
+  const formRef = useRef<any>()
+  useLayoutEffect(() => {
+    if(!hideContact){
+
+      let contactCtx = gsap.context(() => {
+        gsap.from(formRef, {
+          delay: 0.5,
+          duration: 0.5,
+          opacity: 0,
+          scale: 0
+        })
+        
+      }) 
+      return contactCtx.revert()
+    }
+  }, [hideContact])
+
   return (
     <div className={[styles.contactWindow].join(' ')}>
-      <div className={[styles.contactContainer].join(' ')}>
+      <div className={[styles.contactContainer].join(' ')} ref={formRef}>
        {
        
        loading ? <><LoadingSVG /> <Link href={'https://loading.io'}>loading.io</Link></>: messageSent ? <p className={styles.medFont}>{response}</p>:

@@ -1,13 +1,22 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.scss'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Projects from '@/components/Projects'
 import Curriculum from '@/components/Curriculum'
 import Web from '@/components/Web'
 import Presentation from '@/components/Presentation'
-import ContactForm from '@/components/ContactForm'
+import dynamic from 'next/dynamic'
+
+const ContactForm = dynamic(()=> import('../components/ContactForm'), {
+  ssr: false
+})
+// import ContactForm from '@/components/ContactForm'
 import Navbar from '@/components/Navbar'
 import GlassesSVG from '@/components/GlassesSVG'
+import { gsap } from 'gsap'
+import ScrollTrigger from 'gsap/dist/ScrollTrigger'
+gsap.registerPlugin(ScrollTrigger)
+
 
 export default function Home() {
 
@@ -26,7 +35,44 @@ export default function Home() {
     return () => window.removeEventListener('resize', () => setWindowWidth(window.innerWidth))
   }, [windowWidth])
 
- 
+  const title = useRef(null)
+
+  useEffect(() => {
+     let ctxName = gsap.context(() => {
+
+       gsap.from(".gsap_title", {
+         duration: 0.7,
+         delay: 0.3,
+         xPercent: -250,
+         stagger: 0.5,
+         ease: "bounce.out"}) 
+      })
+      return () => ctxName.revert()
+  }, [])
+
+
+  const sectionRefs = useRef<any[]>([])
+  useEffect(()=> {
+
+    let ctxScroll = gsap.context(() => {
+
+      sectionRefs.current.forEach((el, index) => {
+        gsap.from(el, {
+          scrollTrigger: {
+            trigger:el,
+            start: index ===  0 ? "-=100 bottom": "top bottom" ,
+            toggleActions:"play none none reverse",
+          },
+          y: 500,
+          opacity: 0,
+          duration: 0.5
+        })
+      })
+
+
+    })
+    return ()=> ctxScroll.revert()
+  }, [])
   return (
     <>
       {showContact ?
@@ -45,7 +91,7 @@ export default function Home() {
             showContact={() => setShowContact(true)}
             responsive={responsive}
           />
-          :
+         : 
           <Navbar
             showContact={() => setShowContact(true)}
             responsive={responsive}
@@ -56,21 +102,31 @@ export default function Home() {
 
 
         <div className={styles.headerContent}>
-          <h1 className={[styles.headerName, styles.titleFont].join(' ')}>Jonathan Moreschi</h1>
+          <h1 className={[styles.headerName, styles.titleFont].join(' ')}><div className='gsap_title'>Jonathan</div><div className='gsap_title'>Moreschi</div></h1>
           <GlassesSVG />
         </div>
       </header>
-      <main>
+      <main style={{
+          overflowY: "hidden"
+        }}>
+
         <section className={[styles.section].join(' ')}>
           <Presentation />
         </section>
-        <section className={[styles.section].join(' ')} id='portefolio'>
+        <section className={[styles.section].join(' ')} 
+        ref={el => sectionRefs.current[0] = el} 
+        id='portefolio'>
           <Projects />
         </section>
-        <section className={[styles.section].join(' ')} id='curriculum'>
+        <section className={[styles.section].join(' ')}
+        ref={el => sectionRefs.current[1] = el} 
+        id='curriculum'>
           <Curriculum />
         </section>
-        <section className={[styles.section].join(' ')}>
+        <section className={[styles.section].join(' ')}
+        ref={el => sectionRefs.current[2] = el} 
+        
+        >
           <Web />
         </section>
 

@@ -84,7 +84,7 @@ export default async function handler(
         if (projectExists === null) {
           try {
             const cloudinaryImgId = uid()
-            const resCloudinary = await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
+            const resCloudinary = files.image !== undefined && await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
             const project = await prisma.project.create({
               data: {
                 name: fields.name[0],
@@ -97,18 +97,18 @@ export default async function handler(
             })
 
             await prisma.$disconnect()
-            await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+            files.image !== undefined && await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
             res.status(201).json({ data: project })
             return resolve()
 
           } catch (e) {
-            await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+            files.image !== undefined && await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
             await prisma.$disconnect()
             res.status(500).json({ message : "Erreur lors de la création du projet" })
             return resolve()
           }
         } else {
-          await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
+          files.image !== undefined && await fs.rm(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename))
           res.status(400).json({ message: 'Categorie existe déjà' })
           await prisma.$disconnect()
           return resolve()
