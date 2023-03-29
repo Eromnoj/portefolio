@@ -60,7 +60,8 @@ export default function Home() {
         gsap.from(el, {
           scrollTrigger: {
             trigger:el,
-            start:"-=100 bottom",
+            start: "top bottom",
+            end:"30% bottom",
             toggleActions:"play none none reverse",
           },
           y: 500,
@@ -75,6 +76,13 @@ export default function Home() {
   }, [])
   return (
     <>
+    <Head>
+      <title>Jonathan Moreschi : Le Portefolio</title>
+      <meta property="og:title" content="Jonathan Moreschi: le Porteflio" key="title" />
+      <meta name="description" content="Développeur web fullstack, au service de vos projets" />
+      <meta property="og:placename" content="Argeles sur Mer" />
+      <meta property='og:url' content='https://jomoreschi.fr' />
+    </Head>
       {showContact ?
         <ContactForm
           hideContact={() => setShowContact(false)}
@@ -106,9 +114,7 @@ export default function Home() {
           <GlassesSVG />
         </div>
       </header>
-      <main style={{
-          overflowY: "hidden"
-        }}>
+      <main>
 
         <section className={[styles.section].join(' ')}>
           <Presentation />

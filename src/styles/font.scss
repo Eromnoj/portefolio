@@ -1,5 +1,5 @@
 @use 'variables';
-@import url('https://fonts.googleapis.com/css2?family=Mukta&family=Nunito&family=Titan+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mukta&family=Signika&family=Titan+One&display=swap');
 
 .titleFont {
   font-family: 'Titan One';
@@ -16,9 +16,7 @@
 }
 
 .medFont {
-  font-family: 'Nunito';
-  font-style: italic;
-  font-weight: 700;
+  font-family: 'Signika';
   font-size: 1.5em;
   line-height: 48px;
   color: #DE3C4B;
@@ -43,6 +41,14 @@
   font-size: 1.3em;
   line-height: 42px;
   color: #DDF9F3;
+}
+
+.inputFont {
+  font-family: 'Ek Mukta';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.3em;
+  color: variables.$penn-blue;
 }
 
 .cardTitleFont {

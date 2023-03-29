@@ -60,26 +60,23 @@ const ContactForm: FC<ContactFormProps> = ({ hideContact }) => {
   const [loading, setLoading] = useState(false)
   const [messageSent, setMessageSent] = useState(false)
 
-  const formRef = useRef<any>()
-  useLayoutEffect(() => {
-    if(!hideContact){
+  useEffect(() => {
+    let ctxForm = gsap.context(() => {
 
-      let contactCtx = gsap.context(() => {
-        gsap.from(formRef, {
-          delay: 0.5,
-          duration: 0.5,
-          opacity: 0,
+      const formTl = gsap.timeline()
+      formTl
+        .from('.gsap_form', {
+          duration: 0.2,
           scale: 0
         })
-        
-      }) 
-      return contactCtx.revert()
-    }
-  }, [hideContact])
+    })
+    return () => ctxForm.revert()
+  }, [])
 
+  
   return (
-    <div className={[styles.contactWindow].join(' ')}>
-      <div className={[styles.contactContainer].join(' ')} ref={formRef}>
+    <div className={[styles.contactWindow, 'gsap_window'].join(' ')}>
+      <div className={[styles.contactContainer, 'gsap_form'].join(' ')}>
        {
        
        loading ? <><LoadingSVG /> <Link href={'https://loading.io'}>loading.io</Link></>: messageSent ? <p className={styles.medFont}>{response}</p>:
@@ -90,15 +87,15 @@ const ContactForm: FC<ContactFormProps> = ({ hideContact }) => {
         }}>
           <div className={[styles.formInput].join(' ')}>
             <label htmlFor="email" className={[styles.medFont].join(' ')}>Votre Email :</label>
-            <input type="email" name="email" id="email" value={mail.email} onChange={(e)=> dispatch({type: ActionType.EMAIL, value: e.target.value})} />
+            <input type="email" name="email" id="email" className={styles.inputFont} value={mail.email} onChange={(e)=> dispatch({type: ActionType.EMAIL, value: e.target.value})} />
           </div>
           <div className={[styles.formInput].join(' ')}>
             <label htmlFor="subject" className={[styles.medFont].join(' ')}>Sujet :</label>
-            <input type="text" name="subject" id="subject" value={mail.subject} onChange={(e) => dispatch({type: ActionType.SUBJECT, value: e.target.value})} />
+            <input type="text" name="subject" id="subject"  className={styles.inputFont} value={mail.subject} onChange={(e) => dispatch({type: ActionType.SUBJECT, value: e.target.value})} />
           </div>
           <div className={[styles.formInput].join(' ')}>
             <label htmlFor="message" className={[styles.medFont].join(' ')}>Votre message :</label>
-            <textarea name="message" id="message" cols={30} rows={10} value={mail.message} onChange={(e) => dispatch({type: ActionType.MESSAGE, value: e.target.value})}></textarea>
+            <textarea name="message" id="message" cols={30} rows={10}  className={styles.inputFont} value={mail.message} onChange={(e) => dispatch({type: ActionType.MESSAGE, value: e.target.value})}></textarea>
           </div>
           <input type="submit" value="Envoyer" />
         </form>}
