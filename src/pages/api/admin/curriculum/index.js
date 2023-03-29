@@ -15,7 +15,9 @@ export default async function handler(
     if (req.method === 'GET') {
       try {
         const curriculum = await prisma.curriculum.findMany({
-
+          orderBy: {
+            endDate: 'desc'
+          }
         })
 
         await prisma.$disconnect()
