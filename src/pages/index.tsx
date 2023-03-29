@@ -60,7 +60,7 @@ export default function Home() {
         gsap.from(el, {
           scrollTrigger: {
             trigger:el,
-            start: index ===  0 ? "-=100 bottom": "top bottom" ,
+            start:"-=100 bottom",
             toggleActions:"play none none reverse",
           },
           y: 500,
