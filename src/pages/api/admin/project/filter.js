@@ -11,7 +11,6 @@ export default async function handler(
     if (req.method === 'GET') {
 
       const {filter} = req.query
-
       try {
       let project
       if(filter && filter.length > 0) {
@@ -19,7 +18,7 @@ export default async function handler(
           where: {
             categories: {
              some: {
-                id: { in: filter }
+                id: { in: filter.split(',') }
               }
             }
           },
