@@ -41,6 +41,13 @@
   font-size: 1.3em;
   line-height: 42px;
   color: #DDF9F3;
+  strong {
+    font-weight: bold;
+    font-size: 1.1em;
+  }
+  i {
+    font-style: italic;
+  }
 }
 
 .inputFont {
