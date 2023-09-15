@@ -26,11 +26,11 @@ export default async function handler(
 
     const session = await getServerSession(req, res, authOptions)
 
-      if (!session) {
-        res.status(401).json({ message: "You must be logged in." });
-        return resolve()
-      }
-      
+    if (!session) {
+      res.status(401).json({ message: "You must be logged in." });
+      return resolve()
+    }
+
     if (req.method === 'GET') {
       const { id } = req.query
       if (typeof (id) === 'string') {
@@ -39,7 +39,7 @@ export default async function handler(
             where: {
               id: id
             },
-            include: {categories: true}
+            include: { categories: true }
           })
 
           await prisma.$disconnect()
@@ -48,7 +48,7 @@ export default async function handler(
 
         } catch (e) {
           await prisma.$disconnect()
-          res.status(404).json({message: 'Pas de projet enregistré avec cet ID'})
+          res.status(404).json({ message: 'Pas de projet enregistré avec cet ID' })
           return resolve()
         }
       }
@@ -66,7 +66,7 @@ export default async function handler(
           try {
             await cloudStorage.api.delete_resources([project.cloudinaryImgId])
           } catch (error) {
-            res.status(500).json({ message : "Erreur lors de la suppression de l'image du cloud" })
+            res.status(500).json({ message: "Erreur lors de la suppression de l'image du cloud" })
             return resolve()
           }
           res.status(200).json({ data: project })
@@ -107,7 +107,7 @@ export default async function handler(
                 where: {
                   id: id
                 },
-                include:{categories: true}
+                include: { categories: true }
               })
 
               console.log('id', id);
@@ -126,19 +126,19 @@ export default async function handler(
                   res.status(500).json({ message: 'Une erreur est survenue 13' })
                   return resolve()
                 }
-              } 
+              }
 
               try {
                 const categories = fields.categories[0].split('//').map(cat => {
                   return {
                     id: cat
                   }
-                }) 
+                })
                 console.log('categories', categories);
                 const cloudinaryImgId = uid()
-               
-                  files.image !== undefined && await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
-                
+
+                files.image !== undefined && await cloudStorage.uploader.upload(path.join(process.cwd() + "/public", "/uploads", files.image[0].newFilename), { public_id: cloudinaryImgId })
+
 
                 const project = await prisma.project.update({
                   where: {
@@ -146,9 +146,9 @@ export default async function handler(
                   },
                   data: {
                     name: fields.name !== undefined ? fields.name[0] : currentProject.image,
-                    description: fields.description !== undefined ? fields.description[0]: currentProject.description,
+                    description: fields.description !== undefined ? fields.description[0] : currentProject.description,
                     url: fields.url !== undefined ? fields.url[0] : currentProject.url,
-                    categories : {set: categories},
+                    categories: { set: categories },
                     image: files.image !== undefined ? resCloudinary.secure_url : currentProject.image,
                     cloudinaryImgId: files.image !== undefined ? cloudinaryImgId : currentProject.cloudinaryImgId
                   }
@@ -168,8 +168,8 @@ export default async function handler(
               }
 
             } catch (error) {
-            await prisma.$disconnect()
-            res.status(500).json({ message: 'Aucun projet ne correspond a cet id' })
+              await prisma.$disconnect()
+              res.status(500).json({ message: 'Aucun projet ne correspond a cet id' })
               return resolve()
             }
 

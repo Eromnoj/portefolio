@@ -26,6 +26,7 @@
     "nodemailer": "^6.9.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-markdown": "^8.0.7",
     "sass": "^1.58.3",
     "typescript": "4.9.5",
     "uid": "^2.0.1"

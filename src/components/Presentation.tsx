@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styles from '@/styles/CurriculumEntry.module.scss'
 import axios from 'axios'
+import ReactMarkdown from 'react-markdown'
 
 const Presentation = () => {
 
@@ -34,8 +35,14 @@ useEffect(()=> {
         <h3 className={[styles.medFont].join(' ')}>J&apos;me présente...</h3>
       </div>
       <div className={[styles.contentText].join(' ')}>
-        <p className={[styles.contentFont].join(' ')}>
-         {pres} </p>
+        <ReactMarkdown
+            components={{
+              p: ({ node, className, children, ...props }) => {
+                return <p {...props} className={styles.contentFont}>{children}</p>
+              },
+
+            }}
+          >{pres}</ReactMarkdown>
       </div>
     </div>
   )
